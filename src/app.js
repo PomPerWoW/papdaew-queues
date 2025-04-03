@@ -67,7 +67,7 @@ class Application {
 
 const application = new Application();
 
-application.initialize().catch(() => {
-  application.appLogger.error('Error during application initialization');
+application.initialize().catch(error => {
+  application.appLogger.error(error, 'Error during application initialization');
   process.exit(1);
 });
