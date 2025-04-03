@@ -6,7 +6,7 @@ const {
 
 const QueueItem = require('#queues/models/queueItem.model.js');
 const Queue = require('#queues/models/queue.model.js');
-const QueueEvents = require('#queues/events/publishers/queue.events.js');
+const QueueEvents = require('#queues/events/publishers/queue.publisher.js');
 
 class QueueService {
   #logger;
@@ -122,7 +122,7 @@ class QueueService {
     );
 
     // Publish event
-    await this.#queueEvents.publishUserEnqueued(queueItem);
+    await this.#queueEvents.publishUserEnqueued(queueItem, queue.vendorId);
 
     return queueItem;
   }

@@ -18,7 +18,6 @@ class QueueController {
     });
   }
 
-  // Queue Management
   createQueue = asyncHandler(async (req, res) => {
     this.#logger.info('POST: create queue');
 
@@ -80,9 +79,9 @@ class QueueController {
     const { id } = req.params;
     await this.#queueService.deleteQueue(id);
 
-    res.status(StatusCodes.NO_CONTENT).json({
+    res.status(StatusCodes.OK).json({
       status: 'success',
-      data: null,
+      message: 'Queue deleted successfully',
     });
   });
 
