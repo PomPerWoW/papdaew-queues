@@ -15,6 +15,10 @@ const queueSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: [true, 'Vendor ID is required'],
     },
+    branchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, 'Branch ID is required'],
+    },
     currentNumber: {
       type: Number,
       default: 0,
@@ -70,6 +74,60 @@ queueSchema.methods.enqueue = async function () {
 // Static methods
 queueSchema.statics.getQueuesByVendor = async function (vendorId) {
   return this.find({ vendorId, isActive: true });
+};
+
+queueSchema.statics.getQueuesByBranch = async function (branchId, query = {}) {
+  const {
+    page = 1,
+    limit = 20,
+    status,
+    search,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+  } = query;
+
+  // Build filter criteria
+  const filter = { branchId, isActive: true };
+
+  // Add status filter if specified
+  if (status) {
+    filter.status = status;
+  }
+
+  // Add search filter if specified
+  if (search) {
+    filter.$or = [
+      { name: { $regex: search, $options: 'i' } },
+      { description: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  // Calculate pagination
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+
+  // Build sort options
+  const sort = {};
+  sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+  // Execute query with pagination
+  const queues = await this.find(filter)
+    .sort(sort)
+    .skip(skip)
+    .limit(parseInt(limit))
+    .exec();
+
+  // Get total count for pagination
+  const total = await this.countDocuments(filter);
+
+  return {
+    queues,
+    pagination: {
+      total,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      pages: Math.ceil(total / parseInt(limit)),
+    },
+  };
 };
 
 const Queue = mongoose.model('Queue', queueSchema);

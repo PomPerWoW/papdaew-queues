@@ -14,9 +14,15 @@ class QueueRoutes {
   setup() {
     // Queue Management Routes
     this.#router.post('/', this.#queueController.createQueue);
+    this.#router.get('/', this.#queueController.getAllQueues);
+    this.#router.get('/all', this.#queueController.getAllQueues);
     this.#router.get(
       '/vendor/:vendorId',
       this.#queueController.getQueuesByVendor
+    );
+    this.#router.get(
+      '/branch/:branchId',
+      this.#queueController.getQueuesByBranch
     );
     this.#router.get('/:id', this.#queueController.getQueueById);
     this.#router.patch('/:id', this.#queueController.updateQueue);

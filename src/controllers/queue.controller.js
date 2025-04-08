@@ -59,6 +59,56 @@ class QueueController {
     });
   });
 
+  getQueuesByBranch = asyncHandler(async (req, res) => {
+    this.#logger.info(`GET: queues by branch ${req.params.branchId}`);
+
+    const { branchId } = req.params;
+
+    // Extract query parameters for filtering, pagination, and sorting
+    const { page, limit, status, search, sortBy, sortOrder } = req.query;
+
+    // Pass the query parameters to the service
+    const result = await this.#queueService.getQueuesByBranch(branchId, {
+      page,
+      limit,
+      status,
+      search,
+      sortBy,
+      sortOrder,
+    });
+
+    res.status(StatusCodes.OK).json({
+      status: 'success',
+      results: result.queues.length,
+      pagination: result.pagination,
+      data: { queues: result.queues },
+    });
+  });
+
+  getAllQueues = asyncHandler(async (req, res) => {
+    this.#logger.info('GET: all queues');
+
+    // Extract query parameters for filtering, pagination, and sorting
+    const { page, limit, status, search, sortBy, sortOrder } = req.query;
+
+    // Pass the query parameters to the service
+    const result = await this.#queueService.getAllQueues({
+      page,
+      limit,
+      status,
+      search,
+      sortBy,
+      sortOrder,
+    });
+
+    res.status(StatusCodes.OK).json({
+      status: 'success',
+      results: result.queues.length,
+      pagination: result.pagination,
+      data: { queues: result.queues },
+    });
+  });
+
   updateQueue = asyncHandler(async (req, res) => {
     this.#logger.info(`PATCH: update queue ${req.params.id}`);
 

@@ -47,6 +47,83 @@ class QueueService {
     return Queue.getQueuesByVendor(vendorId);
   }
 
+  async getQueuesByBranch(branchId, query = {}) {
+    try {
+      this.#logger.info(`Getting queues for branch ID: ${branchId}`);
+      const result = await Queue.getQueuesByBranch(branchId, query);
+      this.#logger.info(
+        `Retrieved ${result.queues.length} queues for branch ${branchId}`
+      );
+      return result;
+    } catch (error) {
+      this.#logger.error(
+        `Error getting queues for branch ${branchId}: ${error.message}`
+      );
+      throw error;
+    }
+  }
+
+  async getAllQueues(query = {}) {
+    try {
+      const {
+        page = 1,
+        limit = 20,
+        status,
+        search,
+        sortBy = 'createdAt',
+        sortOrder = 'desc',
+      } = query;
+
+      // Build filter criteria
+      const filter = { isActive: true };
+
+      // Add status filter if specified
+      if (status) {
+        filter.status = status;
+      }
+
+      // Add search filter if specified
+      if (search) {
+        filter.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+        ];
+      }
+
+      // Calculate pagination
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+
+      // Build sort options
+      const sort = {};
+      sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+      // Execute query with pagination
+      const queues = await Queue.find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(parseInt(limit))
+        .exec();
+
+      // Get total count for pagination
+      const total = await Queue.countDocuments(filter);
+
+      this.#logger.info(`Retrieved ${queues.length} queues`);
+
+      return {
+        queues,
+        pagination: {
+          total,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          pages: Math.ceil(total / parseInt(limit)),
+        },
+      };
+    } catch (error) {
+      this.#logger.error(`Error getting all queues: ${error.message}`);
+      throw error;
+    }
+  }
+
   async updateQueue(queueId, updateData) {
     const queue = await Queue.findByIdAndUpdate(queueId, updateData, {
       new: true,

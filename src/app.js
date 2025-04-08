@@ -1,7 +1,7 @@
 const { PinoLogger } = require('@papdaew/shared');
 
 const QueueServer = require('#queues/server.js');
-// const EventSubscriber = require('#queues/events/subscribers/event.subscriber.js');
+const EventSubscriber = require('#queues/events/subscribers/event.subscriber.js');
 const MessageBroker = require('#queues/configs/messageBroker.config.js');
 const Database = require('#queues/configs/database.config.js');
 const Config = require('#queues/configs/config.js');
@@ -18,7 +18,7 @@ class Application {
     this.server = new QueueServer();
     this.database = new Database();
     this.messageBroker = new MessageBroker();
-    // this.eventSubscriber = new EventSubscriber();
+    this.eventSubscriber = new EventSubscriber();
   }
 
   initialize = async () => {
@@ -26,7 +26,7 @@ class Application {
     this.setupUncaughtException();
     await this.database.connect();
     await this.messageBroker.connect();
-    // await this.eventSubscriber.setupSubscriptions();
+    await this.eventSubscriber.setupSubscriptions();
     this.server.start();
     this.setupUnhandledRejection();
     this.setupShutdown();
@@ -67,7 +67,7 @@ class Application {
 
 const application = new Application();
 
-application.initialize().catch(error => {
-  application.appLogger.error(error, 'Error during application initialization');
+application.initialize().catch(() => {
+  application.appLogger.error('Error during application initialization');
   process.exit(1);
 });

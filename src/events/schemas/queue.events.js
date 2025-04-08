@@ -22,6 +22,19 @@ const QUEUE_UPDATED = {
   },
 };
 
+const BRANCH_CREATED = {
+  type: 'object',
+  required: ['vendorId', 'branchId', 'branchName'],
+  properties: {
+    vendorId: { type: 'string' },
+    branchId: { type: 'string' },
+    branchName: { type: 'string' },
+    branchCode: { type: 'string' },
+    status: { type: 'string' },
+    createdAt: { type: 'object' },
+  },
+};
+
 const USER_ENQUEUED = {
   type: 'object',
   required: ['queueId', 'userId', 'number', 'joinedAt', 'estimatedWaitTime'],
@@ -59,6 +72,7 @@ const USER_EXITED = {
 module.exports = {
   QUEUE_CREATED,
   QUEUE_UPDATED,
+  BRANCH_CREATED,
   USER_ENQUEUED,
   USER_DEQUEUED,
   USER_EXITED,

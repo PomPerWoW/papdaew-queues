@@ -54,6 +54,14 @@ const queueItemSchema = new mongoose.Schema(
   }
 );
 
+// Virtual for retrieving the queue
+queueItemSchema.virtual('queue', {
+  ref: 'Queue',
+  localField: 'queueId',
+  foreignField: '_id',
+  justOne: true,
+});
+
 // Indexes
 queueItemSchema.index({ queueId: 1, status: 1 });
 queueItemSchema.index({ userId: 1, status: 1 });
